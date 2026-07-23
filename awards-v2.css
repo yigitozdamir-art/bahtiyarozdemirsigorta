@@ -1,0 +1,227 @@
+/* ============================================================
+   Ödüllerimiz — kronolojik zaman çizelgesi
+   Bağımsız stil dosyası; style.css'e dokunulmamıştır.
+   Palet mevcut site tokenlarından türetilmiştir.
+   ============================================================ */
+
+.awards-scene{
+  position:relative;
+  overflow:hidden;
+  background:var(--navy-dark);
+  isolation:isolate;
+}
+
+/* --- Arka plan: iki ödül dolabı fotoğrafı alt alta, dikey olarak tekrar eder --- */
+.awards-bg{
+  position:absolute; inset:0; z-index:0;
+  background-image:url('assets/photos/odul-arka-plan.jpg');
+  background-repeat:repeat-y;
+  background-size:100% auto;
+  background-position:top center;
+  filter:blur(2px) brightness(.40) saturate(.85);
+  transform:scale(1.04);
+}
+.awards-veil{
+  position:absolute; inset:0; z-index:1;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(6,29,50,.35), transparent 60%),
+    linear-gradient(180deg, rgba(6,20,38,.94) 0%, rgba(6,20,38,.70) 22%, rgba(6,20,38,.70) 78%, rgba(6,20,38,.96) 100%),
+    linear-gradient(90deg, rgba(6,20,38,.85), rgba(6,20,38,.35) 30%, rgba(6,20,38,.35) 70%, rgba(6,20,38,.85));
+}
+.awards-scene > .container{position:relative; z-index:2;}
+
+/* --- Bölüm başlığı --- */
+.awards-head{max-width:760px; margin:0 auto; text-align:center;}
+.awards-head .section-kicker{color:var(--tan);}
+.awards-head h2{color:#fff; font-size:clamp(2.3rem,4vw,3.4rem); margin:.35rem 0 1rem;}
+.awards-head p{color:rgba(255,255,255,.78); font-size:1.08rem; margin:0 auto; max-width:60ch;}
+
+.awards-stats{
+  display:flex; justify-content:center; flex-wrap:wrap;
+  gap:2.4rem 3.4rem; margin:2.6rem auto 0;
+}
+.awards-stats .stat{position:relative; text-align:center; min-width:110px;}
+.awards-stats .stat + .stat::before{
+  content:""; position:absolute; left:-1.7rem; top:12%; height:76%;
+  width:1px; background:rgba(255,255,255,.16);
+}
+.awards-stats .num{
+  font-family:'Newsreader',Georgia,serif; font-weight:700; color:#fff;
+  font-size:clamp(2.1rem,3.4vw,2.9rem); line-height:1;
+}
+.awards-stats .lbl{
+  margin-top:.5rem; color:rgba(255,255,255,.66);
+  font-size:.82rem; letter-spacing:.08em; text-transform:uppercase; font-weight:600;
+}
+
+/* --- Zaman çizelgesi --- */
+.aw-timeline{
+  position:relative;
+  max-width:1000px;
+  margin:3.6rem auto 0;
+  padding:1rem 0 .5rem;
+}
+/* Merkez omurga */
+.aw-timeline::before{
+  content:""; position:absolute; top:0; bottom:0; left:50%;
+  width:3px; transform:translateX(-50%);
+  background:linear-gradient(180deg,
+    rgba(198,167,123,0) 0%,
+    rgba(198,167,123,.85) 6%,
+    rgba(198,167,123,.55) 55%,
+    rgba(198,167,123,.85) 94%,
+    rgba(198,167,123,0) 100%);
+  box-shadow:0 0 18px rgba(198,167,123,.35);
+}
+
+.aw-item{
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr 96px 1fr;
+  align-items:start;
+  margin-bottom:2.4rem;
+}
+.aw-item:last-child{margin-bottom:0;}
+
+/* Yıl rozeti (omurga üzerinde) */
+.aw-node{
+  grid-column:2; justify-self:center;
+  position:relative; z-index:3;
+  width:82px; height:82px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:radial-gradient(circle at 35% 30%, #0e4d78, var(--navy-dark));
+  border:2px solid rgba(198,167,123,.85);
+  box-shadow:0 0 0 6px rgba(6,20,38,.55), 0 10px 26px rgba(0,0,0,.5), 0 0 24px rgba(198,167,123,.28);
+  font-family:'Newsreader',Georgia,serif; font-weight:700; color:#fff;
+  font-size:1.28rem; letter-spacing:.01em;
+}
+.aw-node::after{
+  content:""; position:absolute; inset:-2px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.10);
+}
+
+/* Kart */
+.aw-card{
+  position:relative;
+  background:linear-gradient(180deg, rgba(11,34,58,.72), rgba(7,22,40,.72));
+  -webkit-backdrop-filter:blur(9px); backdrop-filter:blur(9px);
+  border:1px solid rgba(198,167,123,.26);
+  border-radius:1.1rem;
+  padding:1.25rem 1.4rem 1.15rem;
+  box-shadow:0 22px 48px rgba(0,0,0,.42);
+  transition:transform .35s ease, box-shadow .35s ease, border-color .35s ease;
+}
+.aw-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(198,167,123,.6);
+  box-shadow:0 30px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(198,167,123,.25);
+}
+/* Sol / sağ yerleşim ve konnektörler */
+.aw-item:nth-child(odd)  .aw-card{grid-column:1; margin-right:1.6rem;}
+.aw-item:nth-child(even) .aw-card{grid-column:3; margin-left:1.6rem;}
+
+.aw-card::before{ /* omurgaya uzanan bağlayıcı çizgi */
+  content:""; position:absolute; top:34px; width:1.7rem; height:2px;
+  background:linear-gradient(90deg, rgba(198,167,123,.75), rgba(198,167,123,.15));
+}
+.aw-item:nth-child(odd) .aw-card::before{right:-1.7rem; background:linear-gradient(90deg, rgba(198,167,123,.15), rgba(198,167,123,.75));}
+.aw-item:nth-child(even) .aw-card::before{left:-1.7rem;}
+
+.aw-card::after{ /* konnektör ucundaki nokta */
+  content:""; position:absolute; top:30px; width:9px; height:9px; border-radius:50%;
+  background:var(--tan); box-shadow:0 0 10px rgba(198,167,123,.7);
+}
+.aw-item:nth-child(odd) .aw-card::after{right:-2.2rem;}
+.aw-item:nth-child(even) .aw-card::after{left:-2.2rem;}
+
+.aw-card .aw-year-tag{
+  display:none; /* yıl rozette; geniş ekranda kart içinde gizli */
+}
+.aw-card ul{list-style:none; margin:0; padding:0;}
+.aw-card li{
+  display:flex; align-items:flex-start; gap:.7rem;
+  padding:.5rem 0;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.aw-card li:first-child{border-top:0; padding-top:.1rem;}
+.aw-card .aw-txt{
+  color:rgba(255,255,255,.9); font-size:.96rem; line-height:1.5;
+}
+.aw-item:nth-child(odd) .aw-card li{flex-direction:row-reverse;}
+.aw-item:nth-child(odd) .aw-card{text-align:right;}
+.aw-item:nth-child(odd) .aw-card .aw-txt{text-align:right;}
+
+/* Sigorta şirketi etiketleri */
+.aw-tag{
+  flex:0 0 auto;
+  font-size:.66rem; font-weight:800; letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:.24rem .55rem; border-radius:.5rem;
+  border:1px solid transparent; white-space:nowrap;
+  margin-top:.08rem;
+}
+.aw-tag--axa    {color:#9ec3ff; background:rgba(43,90,180,.20); border-color:rgba(120,160,235,.45);}
+.aw-tag--sompo  {color:#ff9db0; background:rgba(190,40,70,.20); border-color:rgba(235,110,135,.45);}
+.aw-tag--anadolu{color:#ffc59b; background:rgba(190,95,35,.20); border-color:rgba(235,150,95,.45);}
+.aw-tag--hdi    {color:#8fe6b6; background:rgba(30,150,90,.20); border-color:rgba(90,215,150,.42);}
+
+/* Ortak logoları — bölüm altında künye */
+.aw-partners{
+  margin:4rem auto 0; max-width:820px;
+  border-top:1px solid rgba(255,255,255,.12);
+  padding-top:2.2rem; text-align:center;
+}
+.aw-partners .cap{
+  color:rgba(255,255,255,.55); font-size:.78rem;
+  letter-spacing:.12em; text-transform:uppercase; font-weight:700; margin-bottom:1.2rem;
+}
+.aw-partners .row-logos{
+  display:flex; align-items:center; justify-content:center;
+  flex-wrap:wrap; gap:1rem 1.2rem;
+}
+.aw-partners .chip{
+  height:66px; min-width:140px; padding:.85rem 1.3rem;
+  background:#fff; border-radius:.7rem;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 12px 26px rgba(0,0,0,.28);
+}
+.aw-partners .chip img{max-height:36px; max-width:150px; object-fit:contain;}
+
+/* --- Reveal: kartlar yandan, rozetler ölçekten girer --- */
+.aw-item:nth-child(odd)  .aw-card.reveal{transform:translateX(-42px); opacity:0;}
+.aw-item:nth-child(even) .aw-card.reveal{transform:translateX(42px);  opacity:0;}
+/* is-visible seçicisi, yukarıdaki konumsal kurallardan (nth-child) daha yüksek
+   özgüllüğe sahip olacak şekilde yazıldı; aksi halde opacity:0 baskın kalıp
+   kartları görünmez yapıyordu. */
+.aw-item:nth-child(odd)  .aw-card.reveal.is-visible,
+.aw-item:nth-child(even) .aw-card.reveal.is-visible{transform:none; opacity:1;}
+.aw-node.reveal{transform:scale(.55); opacity:0;}
+.aw-node.reveal.is-visible{transform:none; opacity:1;}
+@media (prefers-reduced-motion: reduce){
+  .aw-card.reveal, .aw-node.reveal{transform:none !important; opacity:1 !important;}
+}
+
+/* ============================ Mobil ============================ */
+@media (max-width:767.98px){
+  .aw-timeline::before{left:26px;}
+  .aw-item{grid-template-columns:52px 1fr; margin-bottom:1.6rem;}
+  .aw-node{
+    grid-column:1; justify-self:center;
+    width:52px; height:52px; font-size:.92rem;
+    box-shadow:0 0 0 5px rgba(6,20,38,.55), 0 8px 18px rgba(0,0,0,.5), 0 0 18px rgba(198,167,123,.28);
+  }
+  .aw-item:nth-child(odd)  .aw-card,
+  .aw-item:nth-child(even) .aw-card{
+    grid-column:2; margin:0 0 0 1.1rem; text-align:left;
+  }
+  .aw-item:nth-child(odd)  .aw-card{margin-right:0;}
+  .aw-item:nth-child(odd)  .aw-card .aw-txt{text-align:left;}
+  .aw-item:nth-child(odd)  .aw-card li{flex-direction:row;}
+  .aw-card::before{left:-1.1rem !important; right:auto !important;
+    background:linear-gradient(90deg, rgba(198,167,123,.75), rgba(198,167,123,.15)) !important;}
+  .aw-card::after{left:-1.55rem !important; right:auto !important;}
+  .aw-item:nth-child(odd)  .aw-card.reveal,
+  .aw-item:nth-child(even) .aw-card.reveal{transform:translateX(28px);}
+  .awards-stats{gap:1.6rem 2.2rem;}
+  .awards-stats .stat + .stat::before{display:none;}
+}
