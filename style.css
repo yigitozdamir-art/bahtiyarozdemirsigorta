@@ -59,7 +59,7 @@ p{line-height:1.82; color:#53606c}
 .service-card .body{padding:1.35rem}
 .partner-section{background:var(--cream); border-top:1px solid var(--line); border-bottom:1px solid var(--line)}
 .partner-logo-card{height:126px; background:#fff; border:1px solid #d9d6d1; display:flex; align-items:center; justify-content:center; padding:1.25rem; transition:.28s ease; border-radius:.25rem; box-shadow:0 8px 18px rgba(6,29,50,.04)}
-.partner-logo-card img{max-width:190px; max-height:72px; object-fit:contain; filter:grayscale(1) contrast(1.12) brightness(.78); opacity:.72; transition:.28s ease}
+.partner-logo-card img{max-width:100%; max-height:72px; object-fit:contain; filter:grayscale(1) contrast(1.12) brightness(.78); opacity:.72; transition:.28s ease}
 .partner-logo-card:hover{transform:translateY(-5px); border-color:rgba(198,167,123,.7); box-shadow:0 16px 36px rgba(10,58,95,.13), 0 0 0 4px color-mix(in srgb, var(--brand-glow, var(--tan)) 28%, transparent)}
 .partner-logo-card:hover img{filter:grayscale(0) saturate(1.2) brightness(1.05); opacity:1}
 .form-card{border:1px solid var(--line); border-radius:1.35rem; padding:2rem; background:#fff; box-shadow:0 20px 45px rgba(6,29,50,.08)}
@@ -252,4 +252,10 @@ a{transition:color .2s ease}
   .cta-inner{flex-direction:column; align-items:flex-start; text-align:left;}
   .stats-band{padding:2.25rem 0;}
   .content-section .text-panel h2{font-size:2rem;}
+  /* Partner logos: shorter cards with less padding so wide logos sit comfortably. */
+  .partner-logo-card{height:104px; padding:.85rem;}
+  .partner-logo-card img{max-height:56px;}
+  /* Keep long words (e-mail, URLs) from pushing the layout wider than the screen. */
+  body{overflow-x:hidden;}
+  .footer-bottom{word-break:break-word;}
 }

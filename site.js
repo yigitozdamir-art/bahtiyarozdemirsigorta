@@ -2,15 +2,13 @@
 (function(){
   // Smooth page transitions: fade in on load, fade out before internal navigation
   const rootEl = document.documentElement;
-  const markReady = () => rootEl.classList.add('page-ready');
+  const markReady = () => { rootEl.classList.remove('page-leaving'); rootEl.classList.add('page-ready'); };
   requestAnimationFrame(markReady);
   setTimeout(markReady, 250); // failsafe: never leave the page hidden
-  window.addEventListener('pageshow', e => {
-    if(e.persisted){
-      rootEl.classList.remove('page-leaving');
-      rootEl.classList.add('page-ready');
-    }
-  });
+  // Always reveal on show — covers back/forward (bfcache) restores on mobile,
+  // where the page could otherwise return still marked 'page-leaving' (blank).
+  window.addEventListener('pageshow', markReady);
+  window.addEventListener('pagehide', () => rootEl.classList.remove('page-leaving'));
   document.addEventListener('click', e => {
     const link = e.target.closest('a[href]');
     if(!link) return;
@@ -173,21 +171,32 @@
   // Play flagged videos only when they scroll into view, pause when they leave.
   const inViewVideos = document.querySelectorAll('video[data-play-in-view]');
   if(inViewVideos.length){
+    // muted must be set as a property (not just the attribute) for mobile autoplay.
+    const tryPlay = v => { v.muted = true; const p = v.play(); if(p && p.catch) p.catch(() => {}); };
     if(!('IntersectionObserver' in window)){
-      inViewVideos.forEach(v => { const p = v.play(); if(p && p.catch) p.catch(() => {}); });
+      inViewVideos.forEach(tryPlay);
     } else {
       const vio = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
           const v = entry.target;
           if(entry.isIntersecting){
-            const p = v.play();
-            if(p && p.catch) p.catch(() => {});
+            tryPlay(v);
           } else if(!v.paused){
             v.pause();
           }
         });
-      }, { threshold: 0.35 });
-      inViewVideos.forEach(v => vio.observe(v));
+      }, { threshold: 0.25 });
+      inViewVideos.forEach(v => { v.muted = true; vio.observe(v); });
     }
+    // iOS Low Power Mode / strict autoplay fallback: some phones refuse the
+    // programmatic play() until the user interacts. Retry on the first tap.
+    const kickVideos = () => {
+      inViewVideos.forEach(v => {
+        const r = v.getBoundingClientRect();
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        if(v.paused && r.top < vh && r.bottom > 0) tryPlay(v);
+      });
+    };
+    ['touchstart','click'].forEach(ev => document.addEventListener(ev, kickVideos, { passive:true }));
   }
 })();
