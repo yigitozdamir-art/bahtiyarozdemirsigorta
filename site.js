@@ -29,9 +29,9 @@
 
   function getStoredLang(){
     try {
-      return localStorage.getItem(storageKey) || 'en';
+      return localStorage.getItem(storageKey) || 'tr';
     } catch (error) {
-      return document.documentElement.dataset.siteLang || 'en';
+      return document.documentElement.dataset.siteLang || 'tr';
     }
   }
 
