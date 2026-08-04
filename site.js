@@ -171,8 +171,15 @@
   // Play flagged videos only when they scroll into view, pause when they leave.
   const inViewVideos = document.querySelectorAll('video[data-play-in-view]');
   if(inViewVideos.length){
+    // On phones, videos flagged data-desktop-video are not fetched/played — the
+    // poster image is shown instead. Saves ~14 MB per video on mobile data.
+    // Checked at play-time so the current viewport width always decides.
+    const skipOnMobile = v => v.hasAttribute('data-desktop-video') && window.matchMedia('(max-width: 991.98px)').matches;
     // muted must be set as a property (not just the attribute) for mobile autoplay.
-    const tryPlay = v => { v.muted = true; const p = v.play(); if(p && p.catch) p.catch(() => {}); };
+    const tryPlay = v => {
+      if(skipOnMobile(v)) return;
+      v.muted = true; const p = v.play(); if(p && p.catch) p.catch(() => {});
+    };
     if(!('IntersectionObserver' in window)){
       inViewVideos.forEach(tryPlay);
     } else {

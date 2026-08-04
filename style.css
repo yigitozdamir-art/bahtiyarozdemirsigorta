@@ -21,7 +21,11 @@ p{line-height:1.82; color:#53606c}
 .brand-logo{width:220px; max-width:52vw; height:auto}
 .nav-link{font-weight:600; color:#4d5966!important; padding:.85rem .65rem!important}
 .nav-link:hover,.nav-link.active{color:var(--navy)!important}
-.service-dropdown{width:min(420px, 92vw); border:1px solid var(--line); border-radius:1rem; padding:.65rem}
+.service-dropdown{width:min(660px, 94vw); border:1px solid var(--line); border-radius:1rem; padding:.75rem; grid-template-columns:repeat(2, minmax(0,1fr)); gap:.1rem .35rem}
+.service-dropdown.show{display:grid}
+.service-dropdown > li:first-child, .service-dropdown > li:nth-child(2){grid-column:1 / -1}
+/* Collapsed navbar (below xl): fall back to a single-column scrollable list */
+@media (max-width:1199.98px){.service-dropdown{width:auto; border:0; padding:.25rem 0} .service-dropdown.show{display:block}}
 .dropdown-item{border-radius:.65rem; padding:.65rem .85rem; color:#425060}
 .dropdown-item:hover{background:var(--cream); color:var(--navy)}
 .btn-navy{background:var(--navy); border-color:var(--navy); color:#fff}
