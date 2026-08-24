@@ -119,14 +119,75 @@
     input.addEventListener('input', () => input.value = input.value.toLocaleUpperCase('tr-TR').replace(/\s+/g,'').slice(0,12));
   });
 
+  // --- Email routing: which inbox(es) each product's requests are sent to ---
+  var MAIL_DOMAIN = '@bahtiyarozdemirsigorta.com';
+  var MAIL_ROUTES = {
+    'kasko-trafik-sigortalari': ['teknik','bilgi'],
+    'ihtiyari-mali-mesuliyet-sigortasi': ['teknik','bilgi'],
+    'yesil-kart-sigortasi': ['teknik','bilgi'],
+    'ferdi-kaza-sigortasi': ['teknik','bilgi'],
+    'saglik-sigortalari-ve-calisan-yan-haklari': ['teknik2'],
+    'hekim-sorumluluk-sigortalari': ['teknik2'],
+    'seyahat-saglik-sigortalari': ['teknik2'],
+    'dask-konut-sigortalari': ['teknik1','baha'],
+    'bireysel-emeklilik-sigortasi': ['muhasebe']
+  };
+  var MAIL_DEFAULT = ['teknik1','kurumsal','elifgulec'];
+  function mailFor(slug){
+    var boxes = MAIL_ROUTES[slug] || MAIL_DEFAULT;
+    return boxes.map(function(b){ return b + MAIL_DOMAIN; }).join(',');
+  }
+  function productName(slug, lang){
+    var opt = document.querySelector('[data-product-select] option[value="' + slug + '"]');
+    if(opt) return lang === 'tr' ? opt.getAttribute('data-tr') : opt.getAttribute('data-en');
+    return slug;
+  }
+  function buildMailto(slug, f){
+    var lang = getStoredLang();
+    var name = productName(slug, lang) || (lang === 'tr' ? 'Sigorta' : 'Insurance');
+    var subject = (lang === 'tr' ? 'Web Talebi - ' : 'Website Request - ') + name;
+    var L = [];
+    L.push((lang === 'tr' ? 'Ürün: ' : 'Product: ') + name);
+    L.push((lang === 'tr' ? 'Ad Soyad: ' : 'Full Name: ') + (f.name || ''));
+    L.push((lang === 'tr' ? 'E-posta: ' : 'E-mail: ') + (f.email || ''));
+    if(f.phone) L.push((lang === 'tr' ? 'Telefon: ' : 'Phone: ') + f.phone);
+    if(f.plate) L.push((lang === 'tr' ? 'Plaka: ' : 'Plate: ') + f.plate);
+    if(f.licenseSerial) L.push((lang === 'tr' ? 'Ruhsat Seri No: ' : 'License Serial: ') + f.licenseSerial);
+    L.push((lang === 'tr' ? 'Not: ' : 'Note: ') + (f.note || ''));
+    return 'mailto:' + mailFor(slug) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(L.join('\r\n'));
+  }
+
+  // --- "Bilgi Al" info modal (product pages) ---
+  var infoModalEl = document.getElementById('infoModal');
+  var infoModalInstance = infoModalEl && window.bootstrap ? new bootstrap.Modal(infoModalEl) : null;
+  document.querySelectorAll('[data-open-info]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var input = document.querySelector('[data-info-service]');
+      if(input) input.value = btn.dataset.service || '';
+      if(infoModalInstance) infoModalInstance.show();
+      else if(infoModalEl) infoModalEl.classList.add('show');
+    });
+  });
+
   document.querySelectorAll('[data-demo-form]').forEach(form => {
     form.addEventListener('submit', e => {
       e.preventDefault();
+      const svcEl = form.querySelector('[name="service"]');
+      const get = n => { const el = form.querySelector('[name="' + n + '"]'); return el ? (el.value || '').trim() : ''; };
+      let mailto = null;
+      if(svcEl && svcEl.value){
+        mailto = buildMailto(svcEl.value, {
+          name: get('name'), email: get('email'), phone: get('phone'),
+          plate: get('plate'), licenseSerial: get('licenseSerial'), note: get('message')
+        });
+      }
       const feedback = form.querySelector('.form-feedback');
       if(feedback){
         const lang = getStoredLang();
         feedback.textContent = lang === 'tr' ? feedback.getAttribute('data-feedback-tr') : feedback.getAttribute('data-feedback-en');
       }
+      if(mailto){ window.location.href = mailto; }
       form.reset();
       updateVehicleFields();
     });
