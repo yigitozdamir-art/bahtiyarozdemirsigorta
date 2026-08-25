@@ -156,6 +156,15 @@
     L.push((lang === 'tr' ? 'Not: ' : 'Note: ') + (f.note || ''));
     return 'mailto:' + mailFor(slug) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(L.join('\r\n'));
   }
+  function buildMailtoTo(to, subject, f){
+    var lang = getStoredLang();
+    var L = [];
+    if(f.name) L.push((lang === 'tr' ? 'Ad Soyad: ' : 'Full Name: ') + f.name);
+    L.push((lang === 'tr' ? 'E-posta: ' : 'E-mail: ') + (f.email || ''));
+    if(f.phone) L.push((lang === 'tr' ? 'Telefon: ' : 'Phone: ') + f.phone);
+    L.push((lang === 'tr' ? 'Mesaj: ' : 'Message: ') + (f.note || ''));
+    return 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(L.join('\r\n'));
+  }
 
   // --- "Bilgi Al" info modal (product pages) ---
   var infoModalEl = document.getElementById('infoModal');
@@ -181,6 +190,10 @@
           name: get('name'), email: get('email'), phone: get('phone'),
           plate: get('plate'), licenseSerial: get('licenseSerial'), note: get('message')
         });
+      } else if(form.getAttribute('data-mailto')){
+        mailto = buildMailtoTo(form.getAttribute('data-mailto'),
+          getStoredLang() === 'tr' ? 'Web Öneri / Şikayet' : 'Website Suggestion / Complaint',
+          { name: get('name'), email: get('email'), phone: get('phone'), note: get('message') });
       }
       const feedback = form.querySelector('.form-feedback');
       if(feedback){

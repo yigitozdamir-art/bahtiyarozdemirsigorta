@@ -17,7 +17,7 @@
   <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/fonts/fonts.css" rel="stylesheet">
   <script>document.documentElement.classList.add("js-nav");</script>
-  <link rel="stylesheet" href="style.css?v=13">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -92,10 +92,10 @@
           <p data-en="The page replaces the old contact page and keeps the form simple: e-mail, phone number and note." data-tr="Bu sayfa eski iletişim sayfasının yerine geçer ve formu sade tutar: e-posta, telefon numarası ve not.">The page replaces the old contact page and keeps the form simple: e-mail, phone number and note.</p>
         </div>
         <div class="col-lg-7">
-          <form class="form-card row g-3" data-demo-form>
-            <div class="col-md-6"><label class="form-label" data-en="E-mail" data-tr="E-posta">E-mail</label><input type="email" class="form-control" required data-placeholder-en="example@mail.com" data-placeholder-tr="ornek@mail.com" placeholder="example@mail.com"></div>
-            <div class="col-md-6"><label class="form-label" data-en="Phone Number" data-tr="Telefon Numarası">Phone Number</label><input type="tel" class="form-control" required data-placeholder-en="05xx xxx xx xx" data-placeholder-tr="05xx xxx xx xx" placeholder="05xx xxx xx xx"></div>
-            <div class="col-12"><label class="form-label" data-en="Your Note" data-tr="Notunuz">Your Note</label><textarea class="form-control" rows="7" required data-placeholder-en="Write your suggestion or complaint" data-placeholder-tr="Öneri veya şikayetinizi yazın" placeholder="Write your suggestion or complaint"></textarea></div>
+          <form class="form-card row g-3" data-demo-form data-mailto="info@bahtiyarozdemirsigorta.com">
+            <div class="col-md-6"><label class="form-label" data-en="E-mail" data-tr="E-posta">E-mail</label><input type="email" name="email" class="form-control" required data-placeholder-en="example@mail.com" data-placeholder-tr="ornek@mail.com" placeholder="example@mail.com"></div>
+            <div class="col-md-6"><label class="form-label" data-en="Phone Number" data-tr="Telefon Numarası">Phone Number</label><input type="tel" name="phone" class="form-control" required data-placeholder-en="05xx xxx xx xx" data-placeholder-tr="05xx xxx xx xx" placeholder="05xx xxx xx xx"></div>
+            <div class="col-12"><label class="form-label" data-en="Your Note" data-tr="Notunuz">Your Note</label><textarea class="form-control" name="message" rows="7" required data-placeholder-en="Write your suggestion or complaint" data-placeholder-tr="Öneri veya şikayetinizi yazın" placeholder="Write your suggestion or complaint"></textarea></div>
             <div class="col-12"><button class="btn btn-navy rounded-pill px-4" type="submit" data-en="Send" data-tr="Gönder">Send</button><p class="form-feedback mt-3 mb-0" data-feedback-en="Feedback form is ready. Live use requires backend or e-mail integration." data-feedback-tr="Geri bildirim formu hazır. Canlı kullanım için backend veya e-posta entegrasyonu gerekir."></p></div>
           </form>
         </div>
@@ -246,6 +246,6 @@
   </div>
 </div>
 <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
-<script src="site.js?v=13"></script>
+<script src="site.js?v=14"></script>
 </body>
 </html>
