@@ -119,51 +119,30 @@
     input.addEventListener('input', () => input.value = input.value.toLocaleUpperCase('tr-TR').replace(/\s+/g,'').slice(0,12));
   });
 
-  // --- Email routing: which inbox(es) each product's requests are sent to ---
-  var MAIL_DOMAIN = '@bahtiyarozdemirsigorta.com';
-  var MAIL_ROUTES = {
-    'kasko-trafik-sigortalari': ['teknik','bilgi'],
-    'ihtiyari-mali-mesuliyet-sigortasi': ['teknik','bilgi'],
-    'yesil-kart-sigortasi': ['teknik','bilgi'],
-    'ferdi-kaza-sigortasi': ['teknik','bilgi'],
-    'saglik-sigortalari-ve-calisan-yan-haklari': ['teknik2'],
-    'hekim-sorumluluk-sigortalari': ['teknik2'],
-    'seyahat-saglik-sigortalari': ['teknik2'],
-    'dask-konut-sigortalari': ['teknik1','baha'],
-    'bireysel-emeklilik-sigortasi': ['muhasebe']
+  // --- Email delivery via Web3Forms (automatic, per-product routing by key) ---
+  // Each product belongs to a "route"; each route has its own Web3Forms access
+  // key whose recipient email(s) are set in the Web3Forms dashboard.
+  var ROUTE = {
+    'kasko-trafik-sigortalari':'oto','ihtiyari-mali-mesuliyet-sigortasi':'oto','yesil-kart-sigortasi':'oto','ferdi-kaza-sigortasi':'oto',
+    'saglik-sigortalari-ve-calisan-yan-haklari':'saglik','hekim-sorumluluk-sigortalari':'saglik','seyahat-saglik-sigortalari':'saglik',
+    'dask-konut-sigortalari':'konut',
+    'bireysel-emeklilik-sigortasi':'bes'
   };
-  var MAIL_DEFAULT = ['teknik1','kurumsal','elifgulec'];
-  function mailFor(slug){
-    var boxes = MAIL_ROUTES[slug] || MAIL_DEFAULT;
-    return boxes.map(function(b){ return b + MAIL_DOMAIN; }).join(',');
-  }
+  // Web3Forms access keys per route. Empty entries fall back to W3F_DEFAULT.
+  var W3F_DEFAULT = '0cf797d9-9408-444a-b292-333df3251c1f';
+  var W3F_KEY = {
+    oto:'',      // teknik@ + bilgi@
+    saglik:'',   // teknik2@
+    konut:'',    // teknik1@ + baha@
+    bes:'',      // muhasebe@
+    genel:'',    // teknik1@ + kurumsal@ + elifgulec@ (all other products)
+    oneri:''     // info@ (suggestions / complaints)
+  };
+  function w3fKey(group){ return W3F_KEY[group] || W3F_DEFAULT; }
   function productName(slug, lang){
     var opt = document.querySelector('[data-product-select] option[value="' + slug + '"]');
     if(opt) return lang === 'tr' ? opt.getAttribute('data-tr') : opt.getAttribute('data-en');
     return slug;
-  }
-  function buildMailto(slug, f){
-    var lang = getStoredLang();
-    var name = productName(slug, lang) || (lang === 'tr' ? 'Sigorta' : 'Insurance');
-    var subject = (lang === 'tr' ? 'Web Talebi - ' : 'Website Request - ') + name;
-    var L = [];
-    L.push((lang === 'tr' ? 'Ürün: ' : 'Product: ') + name);
-    L.push((lang === 'tr' ? 'Ad Soyad: ' : 'Full Name: ') + (f.name || ''));
-    L.push((lang === 'tr' ? 'E-posta: ' : 'E-mail: ') + (f.email || ''));
-    if(f.phone) L.push((lang === 'tr' ? 'Telefon: ' : 'Phone: ') + f.phone);
-    if(f.plate) L.push((lang === 'tr' ? 'Plaka: ' : 'Plate: ') + f.plate);
-    if(f.licenseSerial) L.push((lang === 'tr' ? 'Ruhsat Seri No: ' : 'License Serial: ') + f.licenseSerial);
-    L.push((lang === 'tr' ? 'Not: ' : 'Note: ') + (f.note || ''));
-    return 'mailto:' + mailFor(slug) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(L.join('\r\n'));
-  }
-  function buildMailtoTo(to, subject, f){
-    var lang = getStoredLang();
-    var L = [];
-    if(f.name) L.push((lang === 'tr' ? 'Ad Soyad: ' : 'Full Name: ') + f.name);
-    L.push((lang === 'tr' ? 'E-posta: ' : 'E-mail: ') + (f.email || ''));
-    if(f.phone) L.push((lang === 'tr' ? 'Telefon: ' : 'Phone: ') + f.phone);
-    L.push((lang === 'tr' ? 'Mesaj: ' : 'Message: ') + (f.note || ''));
-    return 'mailto:' + to + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(L.join('\r\n'));
   }
 
   // --- "Bilgi Al" info modal (product pages) ---
@@ -179,30 +158,52 @@
     });
   });
 
-  document.querySelectorAll('[data-demo-form]').forEach(form => {
-    form.addEventListener('submit', e => {
+  document.querySelectorAll('[data-demo-form]').forEach(function(form){
+    form.addEventListener('submit', function(e){
       e.preventDefault();
-      const svcEl = form.querySelector('[name="service"]');
-      const get = n => { const el = form.querySelector('[name="' + n + '"]'); return el ? (el.value || '').trim() : ''; };
-      let mailto = null;
-      if(svcEl && svcEl.value){
-        mailto = buildMailto(svcEl.value, {
-          name: get('name'), email: get('email'), phone: get('phone'),
-          plate: get('plate'), licenseSerial: get('licenseSerial'), note: get('message')
-        });
-      } else if(form.getAttribute('data-mailto')){
-        mailto = buildMailtoTo(form.getAttribute('data-mailto'),
-          getStoredLang() === 'tr' ? 'Web Öneri / Şikayet' : 'Website Suggestion / Complaint',
-          { name: get('name'), email: get('email'), phone: get('phone'), note: get('message') });
+      var lang = getStoredLang();
+      var svcEl = form.querySelector('[name="service"]');
+      var get = function(n){ var el = form.querySelector('[name="' + n + '"]'); return el ? (el.value || '').trim() : ''; };
+      var feedback = form.querySelector('.form-feedback');
+      var setFb = function(t){ if(feedback) feedback.textContent = t; };
+      var ok = feedback ? (lang === 'tr' ? feedback.getAttribute('data-feedback-tr') : feedback.getAttribute('data-feedback-en')) : '';
+      var err = lang === 'tr' ? 'Gönderilemedi. Lütfen tekrar deneyin ya da bizi arayın.' : 'Could not send. Please try again or call us.';
+
+      var slug = svcEl ? svcEl.value : '';
+      var group, subject;
+      if(form.getAttribute('data-mailto') || form.hasAttribute('data-oneri')){
+        group = 'oneri';
+        subject = lang === 'tr' ? 'Web Öneri / Şikayet' : 'Website Suggestion / Complaint';
+      } else if(slug){
+        group = ROUTE[slug] || 'genel';
+        subject = (lang === 'tr' ? 'Web Talebi - ' : 'Website Request - ') + productName(slug, lang);
+      } else {
+        // no service, no fixed recipient — just confirm
+        setFb(ok); form.reset(); updateVehicleFields(); return;
       }
-      const feedback = form.querySelector('.form-feedback');
-      if(feedback){
-        const lang = getStoredLang();
-        feedback.textContent = lang === 'tr' ? feedback.getAttribute('data-feedback-tr') : feedback.getAttribute('data-feedback-en');
-      }
-      if(mailto){ window.location.href = mailto; }
-      form.reset();
-      updateVehicleFields();
+
+      var payload = {
+        access_key: w3fKey(group),
+        subject: subject,
+        from_name: 'Bahtiyar Ozdemir Sigorta Web',
+        "Urun": slug ? productName(slug, lang) : '-',
+        "Ad Soyad": get('name'),
+        email: get('email'),
+        "Telefon": get('phone'),
+        "Mesaj / Not": get('message')
+      };
+      if(get('plate')) payload["Plaka"] = get('plate');
+      if(get('licenseSerial')) payload["Ruhsat Seri No"] = get('licenseSerial');
+
+      setFb(lang === 'tr' ? 'Gönderiliyor…' : 'Sending…');
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(r){ return r.json(); }).then(function(data){
+        if(data && data.success){ setFb(ok); form.reset(); updateVehicleFields(); }
+        else { setFb(err); }
+      }).catch(function(){ setFb(err); });
     });
   });
 
