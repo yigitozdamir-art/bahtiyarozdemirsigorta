@@ -204,7 +204,7 @@
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(payload)
       }).then(function(r){ return r.json(); }).then(function(data){
-        if(data && data.success){ setFb(ok); form.reset(); updateVehicleFields(); }
+        if(data && data.success){ form.reset(); updateVehicleFields(); window.location.href = 'tesekkurler.html'; }
         else { setFb(err); }
       }).catch(function(){ setFb(err); });
     });
