@@ -139,6 +139,8 @@
     oneri:''     // info@ (suggestions / complaints)
   };
   function w3fKey(group){ return W3F_KEY[group] || W3F_DEFAULT; }
+  // Route tag added to the email subject so cPanel filters can forward to the right department.
+  var GROUP_TAG = { oto:'R1', saglik:'R2', konut:'R3', bes:'R4', genel:'R5', oneri:'R6' };
   function productName(slug, lang){
     var opt = document.querySelector('[data-product-select] option[value="' + slug + '"]');
     if(opt) return lang === 'tr' ? opt.getAttribute('data-tr') : opt.getAttribute('data-en');
@@ -181,6 +183,7 @@
         // no service, no fixed recipient — just confirm
         setFb(ok); form.reset(); updateVehicleFields(); return;
       }
+      subject = '[' + (GROUP_TAG[group] || 'R5') + '] ' + subject;
 
       var payload = {
         access_key: w3fKey(group),
